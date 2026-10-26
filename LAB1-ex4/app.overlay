@@ -1,0 +1,85 @@
+#include <zephyr/dt-bindings/gpio/gpio.h>
+
+/* Overlay cho BKIT ARM4 (STM32F407ZGT6), dựa trên board stm32f4_disco. */
+/ {
+	model = "BKIT ARM4 (STM32F407ZGT6)";
+
+	chosen {
+		/* USART1 (PA9/PA10 -> MAX232 -> cổng RS232 DB9) */
+		zephyr,console = &usart1;
+		zephyr,shell-uart = &usart1;
+	};
+
+	leds {
+		compatible = "gpio-leds";
+
+		/* LED3 debug, tích cực mức cao trên PE4 */
+		debug_led: led-debug {
+			gpios = <&gpioe 4 GPIO_ACTIVE_HIGH>;
+		};
+
+		/* Ngõ ra Y0/Y1 qua opto, có LED báo trạng thái. */
+		output_y0: output-y0 {
+			gpios = <&gpioe 5 GPIO_ACTIVE_HIGH>;
+		};
+
+		output_y1: output-y1 {
+			gpios = <&gpioe 6 GPIO_ACTIVE_HIGH>;
+		};
+	};
+
+	aliases {
+		led0 = &debug_led;
+		led1 = &output_y0;
+		led2 = &output_y1;
+		/delete-property/ led3;
+	};
+};
+
+&usart1 {
+	/* PA9 = TX, PA10 = RX (xem Bảng 7 - ARM_KIT.pdf) */
+	pinctrl-0 = <&usart1_tx_pa9 &usart1_rx_pa10>;
+	pinctrl-names = "default";
+	current-speed = <115200>;
+	status = "okay";
+};
+
+/*
+ * Tắt ngoại vi Discovery có chân trùng với phần cứng BKIT:
+ * PA2/PA3 nối ESP8266, PD0/PD1 nối FSMC, PB6/PB9 nối I2C/CAN.
+ */
+&usart2 {
+	status = "disabled";
+};
+
+&can1 {
+	status = "disabled";
+};
+
+&can2 {
+	status = "disabled";
+};
+
+&i2c1 {
+	status = "disabled";
+};
+
+&i2s3 {
+	status = "disabled";
+};
+
+&adc1 {
+	status = "disabled";
+};
+
+&timers2 {
+	status = "disabled";
+};
+
+&timers4 {
+	status = "disabled";
+};
+
+&usbotg_fs {
+	status = "disabled";
+};
